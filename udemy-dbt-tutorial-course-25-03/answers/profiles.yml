@@ -3,7 +3,9 @@ answers: # this needs to match the profile: in your dbt_project.yml file
   outputs:
     dev:
       type: bigquery
-      method: oauth
+      # method: oauth
+      method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
+      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
       # To use this, first run (in your terminal): export BIGQUERY_PROJECT="your_project_name"
       # Then dbt will recognise the variable
       database: "{{ env_var('BIGQUERY_PROJECT') }}"
@@ -16,7 +18,9 @@ answers: # this needs to match the profile: in your dbt_project.yml file
     # You won't use this, but an example of using a different target
     production:
       type: bigquery
-      method: oauth
+      # method: oauth
+      method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
+      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
       database: "{{ env_var('BIGQUERY_PROJECT') }}"
       schema: dbt_production
       threads: 64
