@@ -1,69 +1,67 @@
 version: 2
 
 models:
-  - name: stg_ecommerce__orders
+  - name: stg_ecommerce__orders  # Model dla tabeli zamówień w hurtowni danych e-commerce
     columns:
-      - name: order_id
+      - name: order_id  # Unikalny identyfikator zamówienia
         tests:
-          - not_null:
-              severity: error
-          - unique:
+          - not_null:  # Sprawdza, czy kolumna nie zawiera wartości NULL
+              severity: error  # Jeśli test nie przejdzie, zgłasza błąd krytyczny
+          - unique:  # Sprawdza, czy wartości w kolumnie są unikalne
               severity: error
 
-      - name: user_id
+      - name: user_id  # Identyfikator użytkownika składającego zamówienie
         tests:
-          - not_null
+          - not_null  # Każde zamówienie musi mieć przypisanego użytkownika
 
-      - name: created_at
+      - name: created_at  # Data i czas utworzenia zamówienia
         description: "When the order was created"
         tests:
-          - not_null
+          - not_null  # Każde zamówienie musi mieć określoną datę utworzenia
 
-      - name: returned_at
+      - name: returned_at  # Data i czas zwrotu zamówienia (jeśli dotyczy)
         description: "When the order was returned"
         tests:
           - not_null:
-              where: "status = 'Returned'"
+              where: "status = 'Returned'"  # Jeśli zamówienie ma status "Returned", to wartość nie może być NULL
           - dbt_utils.expression_is_true:
-              expression: ">= delivered_at"
+              expression: ">= delivered_at"  # Zwrot musi nastąpić po dostawie
               where: "delivered_at IS NOT NULL AND returned_at IS NOT NULL"
 
-      - name: delivered_at
+      - name: delivered_at  # Data i czas dostarczenia zamówienia
         description: "When the order was delivered"
         tests:
           - not_null:
-              where: "returned_at IS NOT NULL OR status = 'Complete'"
+              where: "returned_at IS NOT NULL OR status = 'Complete'"  # Wartość wymagana dla zwróconych lub ukończonych zamówień
           - dbt_utils.expression_is_true:
-              expression: ">= shipped_at"
+              expression: ">= shipped_at"  # Dostawa musi nastąpić po wysyłce
               where: "delivered_at IS NOT NULL AND shipped_at IS NOT NULL"
 
-      - name: shipped_at
+      - name: shipped_at  # Data i czas wysyłki zamówienia
         description: "When the order was shipped"
         tests:
           - not_null:
-              where: "delivered_at IS NOT NULL OR status = 'Shipped'"
+              where: "delivered_at IS NOT NULL OR status = 'Shipped'"  # Wartość wymagana, jeśli zamówienie zostało dostarczone lub jest w trakcie wysyłki
           - dbt_utils.expression_is_true:
-              expression: ">= created_at"
+              expression: ">= created_at"  # Wysyłka nie może nastąpić przed utworzeniem zamówienia
               where: "shipped_at IS NOT NULL"
 
-      - name: status
-        # Look in documents/ecommerce/doc_ecommerce__status.md for this definition
-        # We can reuse this definition in any column
-        description: "{{ doc('status') }}"
+      - name: status  # Status zamówienia
+        description: "{{ doc('status') }}"  # Odniesienie do dokumentacji statusów zamówień
         tests:
-          - not_null
+          - not_null  # Status zamówienia nie może być pusty
           - accepted_values:
-              name: unexpected_order_status # We can name our tests to make it easier to give more meaningful errors
-              values:
+              name: unexpected_order_status  # Nazwa testu dla lepszego debugowania
+              values:  # Dozwolone wartości dla statusu zamówienia
                 - Processing
                 - Cancelled
                 - Shipped
                 - Complete
                 - Returned
 
-      - name: num_items_ordered
+      - name: num_items_ordered  # Liczba zamówionych produktów
         description: "Number of items in the order"
         tests:
-          - not_null
+          - not_null  # Każde zamówienie powinno mieć określoną liczbę produktów
           - dbt_expectations.expect_column_values_to_be_between:
-              min_value: 0
+              min_value: 0  # Minimalna liczba produktów w zamówieniu to 0 (np. w przypadku anulowanych zamówień)
