@@ -14,6 +14,7 @@ answers: # this needs to match the profile: in your dbt_project.yml file
       timeout_seconds: 300
       location: US
       priority: interactive # BigQuery can use "batch" or "interactive". https://cloud.google.com/bigquery/docs/running-queries
+      maximum_bytes_billed: 1000000000  # Limit 1 GB na zapytanie
 
     # You won't use this, but an example of using a different target
     production:
@@ -27,3 +28,4 @@ answers: # this needs to match the profile: in your dbt_project.yml file
       timeout_seconds: 300
       location: US
       priority: interactive
+      maximum_bytes_billed: 1000000000  # Limit 1 GB na zapytanie

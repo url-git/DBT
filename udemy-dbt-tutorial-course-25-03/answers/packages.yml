@@ -2,7 +2,7 @@ packages:
   # Pakiet dbt_utils to zestaw przydatnych makr i funkcji ułatwiających pracę z dbt.
   # Obejmuje funkcje takie jak `generate_surrogate_key()`, `pivot()`, `date_spine()`.
   - package: dbt-labs/dbt_utils
-    version: 1.0.0  # Używasz wersji 1.0.0, ale dostępna jest aktualizacja do 1.3.0
+    version: 1.3.0  # Używasz wersji 1.0.0, ale dostępna jest aktualizacja do 1.3.0
 
   # dbt_expectations to pakiet walidacyjny inspirowany Great Expectations.
   # Pozwala na sprawdzenie warunków w danych (np. brak wartości NULL, unikalność kolumn).
@@ -12,4 +12,4 @@ packages:
   # Codegen automatycznie generuje kod dbt, np. modele SQL czy testy.
   # Przydatny do szybkiego tworzenia szablonów w projektach dbt.
   - package: dbt-labs/codegen
-    version: 0.9.0  # Możesz zaktualizować do wersji 0.13.1
+    version: 0.13.1  # Możesz zaktualizować do wersji 0.13.1
