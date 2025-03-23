@@ -1,0 +1,14 @@
+project:
+  outputs:
+    dev:
+      dataset: dbt_dev
+      job_execution_timeout_seconds: 300
+      job_retries: 1
+      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json
+      location: US
+      method: service-account
+      priority: interactive
+      project: coral-shift-440513-f3
+      threads: 64
+      type: bigquery
+  target: dev
