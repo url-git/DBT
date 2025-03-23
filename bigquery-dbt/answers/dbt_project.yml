@@ -1,0 +1,56 @@
+# Nazwij swój projekt! Nazwy projektów powinny zawierać tylko małe litery
+# i podkreślniki. Dobra nazwa pakietu powinna odzwierciedlać nazwę organizacji
+# lub przeznaczenie tych modeli.
+name: 'answers'  # Nazwa projektu
+version: '1.0.0'  # Wersja projektu
+config-version: 2  # Wersja konfiguracji
+
+# To ustawienie konfiguruje, którego "profilu" dbt używa dla tego projektu.
+profile: 'answers'  # Powiązanie projektu z profilem o nazwie 'answers'
+
+# Te konfiguracje określają, gdzie dbt powinien szukać różnych typów plików.
+# Na przykład `model-paths` wskazuje, że modele znajdują się w katalogu "models/".
+# Prawdopodobnie nie trzeba będzie tego zmieniać.
+model-paths: ["models"]  # Katalog z modelami dbt
+analysis-paths: ["analyses"]  # Katalog z analizami SQL
+test-paths: ["tests"]  # Katalog z testami
+seed-paths: ["seeds"]  # Katalog z danymi inicjalizującymi
+macro-paths: ["macros"]  # Katalog z makrami
+snapshot-paths: ["snapshots"]  # Katalog ze snapshotami danych
+
+target-path: "target"  # Katalog przechowujący skompilowane pliki SQL
+clean-targets:  # Katalogi, które zostaną usunięte przez `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+# Na początku każdego procesu dbt zostanie uruchomione makro get_brand_name()
+# (zdefiniowane w macros/macro_get_brand_name.sql). Tworzy ono funkcję użytkownika (UDF)
+# w schemacie w BigQuery.
+on-run-start:
+  - "{{ get_brand_name() }}"  # Automatyczne uruchomienie makra na starcie
+
+# Konfiguracja modeli dbt
+# Pełna dokumentacja: https://docs.getdbt.com/docs/configuring-models
+
+# W tej konfiguracji dbt buduje wszystkie modele w katalogu example/ jako tabele.
+# Te ustawienia można nadpisać w poszczególnych plikach modelu, używając makra `{{ config(...) }}`.
+models:
+  answers:
+    # Konfiguracja oznaczona przez "+" stosuje się do wszystkich plików w models/example/.
+    # Działałoby to także bez "+", ale pozwala to odróżnić ścieżkę zasobów od ustawień.
+    +materialized: table  # Domyślna materializacja to tabela
+    +persist_docs:  # Zapisuje opisy kolumn w BigQuery
+      relation: true
+      columns: true
+    # Tabele są automatycznie usuwane po 168 godzinach (7 dniach).
+    # Uwaga: dla modeli inkrementalnych nie resetuje się to przy każdym uruchomieniu!
+    +hours_to_expiration: 168
+
+    marts:
+      # W praktyce byłoby to użyteczne tylko, gdybyśmy mieli podfoldery w katalogach marts/staging/intermediate.
+      # Jest to przykład, jak przypisać grupę do folderu.
+      +group: sales  # Przypisanie modeli do grupy "sales"
+
+tests:
+  answers:
+    +severity: warn  # Testy w katalogu `answers` zwracają ostrzeżenia zamiast błędów
