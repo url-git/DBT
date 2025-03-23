@@ -8,7 +8,8 @@ answers: # this needs to match the profile: in your dbt_project.yml file
       keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
       # To use this, first run (in your terminal): export BIGQUERY_PROJECT="your_project_name"
       # Then dbt will recognise the variable
-      database: "{{ env_var('BIGQUERY_PROJECT') }}"
+      # database: "{{ env_var('BIGQUERY_PROJECT') }}"
+      database: "coral-shift-440513-f3"
       schema: dbt_dev # Replace this with dbt_your_name, e.g. dbt_bob
       threads: 64 # Max number of concurrent things running at once
       timeout_seconds: 300
@@ -22,7 +23,8 @@ answers: # this needs to match the profile: in your dbt_project.yml file
       # method: oauth
       method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
       keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
-      database: "{{ env_var('BIGQUERY_PROJECT') }}"
+      # database: "{{ env_var('BIGQUERY_PROJECT') }}"
+      database: "coral-shift-440513-f3"
       schema: dbt_production
       threads: 64
       timeout_seconds: 300
