@@ -1,26 +1,27 @@
 {#
-	Creates a function in the target schema that can be used to extract the brand name
-	from the events table web link column.
+	Ta funkcja tworzy funkcję w docelowym schemacie, która może być użyta do wyodrębnienia nazwy marki
+	z kolumny linku w tabeli zdarzeń.
 
-	For those not familiar with regex (regular expressions), they are basically a very powerful
-	way to search within strings for any pattern of letters/numbers etc.
+	W tym przykładzie wyodrębniamy wszystko, co znajduje się po "/brand/", ponieważ wszystkie odpowiednie linki
+	kończą się nazwą marki.
 
-	In this example, we extract everything after /brand/ as all of the relevantweb links end
-	with the brand name.
-
-	e.g., take this web link: "/department/men/category/active/brand/columbia"
-	Our regex match pattern, ".+/brand/(.+)", does the following:
-	- ".+" matches ANYTHING 1 or more times. By itself, it would return the whole string!
-	- "/brand/" matches exactly that in the web link.
-		If we used ".+/brand/" as our match pattern, it would return "/department/men/category/active/brand/"
-	- "(.+)" does 2 things:
-		1. The brackets denote that this is the part we want to return
-		2. ".+" will, again, match ANYTHING after "brand/"
+	Przykład: weźmy link: "/department/men/category/active/brand/columbia"
+	Nasze wyrażenie regularne ".+/brand/(.+)" działa w następujący sposób:
+	- ".+" oznacza DOWOLNY ciąg znaków 1 lub więcej razy. Samodzielnie, zwróciłoby cały ciąg!
+	- "/brand/" dokładnie pasuje do tego fragmentu w linku.
+		Jakbyśmy użyli ".+/brand/", zwróciłoby "/department/men/category/active/brand/"
+	- "(.+)" wykonuje dwie rzeczy:
+		1. Nawiasy oznaczają, że to jest część, którą chcemy zwrócić
+		2. ".+" ponownie pasuje do DOWOLNEGO ciągu znaków po "/brand/"
 #}
+
 {% macro get_brand_name() %}
+	-- Tworzymy lub zastępujemy funkcję w docelowym schemacie, która wyodrębnia nazwę marki z linku
 	CREATE OR REPLACE FUNCTION {{ target.schema }}.get_brand_name(web_link STRING)
 	RETURNS STRING
 	AS (
-		REGEXP_EXTRACT(web_link, r'.+/brand/(.+)')
+		-- Funkcja REGEXP_EXTRACT służy do wyodrębnienia nazwy marki z linku (web_link)
+		-- Wyrażenie regularne r'.+/brand/(.+)' pasuje do tekstu po "/brand/"
+		REGEXP_EXTRACT(web_link, r'.+/brand/(.+)') 
 	)
 {% endmacro %}

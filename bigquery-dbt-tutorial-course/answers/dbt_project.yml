@@ -1,57 +1,56 @@
+# Nazwij swój projekt! Nazwy projektów powinny zawierać tylko małe litery
+# i podkreślniki. Dobra nazwa pakietu powinna odzwierciedlać nazwę organizacji
+# lub przeznaczenie tych modeli.
+name: 'answers'  # Nazwa projektu
+version: '1.0.0'  # Wersja projektu
+config-version: 2  # Wersja konfiguracji
 
-# Name your project! Project names should contain only lowercase characters
-# and underscores. A good package name should reflect your organization's
-# name or the intended use of these models
-name: 'answers'
-version: '1.0.0'
-config-version: 2
+# To ustawienie konfiguruje, którego "profilu" dbt używa dla tego projektu.
+profile: 'answers'  # Powiązanie projektu z profilem o nazwie 'answers'
 
-# This setting configures which "profile" dbt uses for this project.
-profile: 'answers'
+# Te konfiguracje określają, gdzie dbt powinien szukać różnych typów plików.
+# Na przykład `model-paths` wskazuje, że modele znajdują się w katalogu "models/".
+# Prawdopodobnie nie trzeba będzie tego zmieniać.
+model-paths: ["models"]  # Katalog z modelami dbt
+analysis-paths: ["analyses"]  # Katalog z analizami SQL
+test-paths: ["tests"]  # Katalog z testami
+seed-paths: ["seeds"]  # Katalog z danymi inicjalizującymi
+macro-paths: ["macros"]  # Katalog z makrami
+snapshot-paths: ["snapshots"]  # Katalog ze snapshotami danych
 
-# These configurations specify where dbt should look for different types of files.
-# The `model-paths` config, for example, states that models in this project can be
-# found in the "models/" directory. You probably won't need to change these!
-model-paths: ["models"]
-analysis-paths: ["analyses"]
-test-paths: ["tests"]
-seed-paths: ["seeds"]
-macro-paths: ["macros"]
-snapshot-paths: ["snapshots"]
-
-target-path: "target"  # directory which will store compiled SQL files
-clean-targets:         # directories to be removed by `dbt clean`
+target-path: "target"  # Katalog przechowujący skompilowane pliki SQL
+clean-targets:  # Katalogi, które zostaną usunięte przez `dbt clean`
   - "target"
   - "dbt_packages"
 
-# At the start of any dbt process, this will run the get_brand_name() macro in macros/macro_get_brand_name.sql
-# which will create a User Defined Function (UDF) in our schema in BigQuery
+# Na początku każdego procesu dbt zostanie uruchomione makro get_brand_name()
+# (zdefiniowane w macros/macro_get_brand_name.sql). Tworzy ono funkcję użytkownika (UDF)
+# w schemacie w BigQuery.
 on-run-start:
-  - "{{ get_brand_name() }}"
+  - "{{ get_brand_name() }}"  # Automatyczne uruchomienie makra na starcie
 
-# Configuring models
-# Full documentation: https://docs.getdbt.com/docs/configuring-models
+# Konfiguracja modeli dbt
+# Pełna dokumentacja: https://docs.getdbt.com/docs/configuring-models
 
-# In this example config, we tell dbt to build all models in the example/ directory
-# as tables. These settings can be overridden in the individual model files
-# using the `{{ config(...) }}` macro.
+# W tej konfiguracji dbt buduje wszystkie modele w katalogu example/ jako tabele.
+# Te ustawienia można nadpisać w poszczególnych plikach modelu, używając makra `{{ config(...) }}`.
 models:
   answers:
-    # Config indicated by "+"" and applies to all files under models/example/
-    # It would still work without the "+", but it's useful to distinguish from a resource path
-    +materialized: table # Default to table materialisation
-    +persist_docs: # Writes all of our column descriptions into BigQuery!
+    # Konfiguracja oznaczona przez "+" stosuje się do wszystkich plików w models/example/.
+    # Działałoby to także bez "+", ale pozwala to odróżnić ścieżkę zasobów od ustawień.
+    +materialized: table  # Domyślna materializacja to tabela
+    +persist_docs:  # Zapisuje opisy kolumn w BigQuery
       relation: true
       columns: true
-    # Table deletes 168 hours (7 days) after creation
-    # Note, for incremental models this does not reset each run!
+    # Tabele są automatycznie usuwane po 168 godzinach (7 dniach).
+    # Uwaga: dla modeli inkrementalnych nie resetuje się to przy każdym uruchomieniu!
     +hours_to_expiration: 168
 
     marts:
-      # In reality this would only be useful if we had subfolders within marts/staging/intermediate
-      # but this is an illustration how you would apply a group to a folder
-      +group: sales
+      # W praktyce byłoby to użyteczne tylko, gdybyśmy mieli podfoldery w katalogach marts/staging/intermediate.
+      # Jest to przykład, jak przypisać grupę do folderu.
+      +group: sales  # Przypisanie modeli do grupy "sales"
 
 tests:
   answers:
-    +severity: warn
+    +severity: warn  # Testy w katalogu `answers` zwracają ostrzeżenia zamiast błędów

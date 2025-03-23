@@ -1,29 +1,30 @@
-answers: # this needs to match the profile: in your dbt_project.yml file
-  target: dev # The default for any dbt commands
+answers: # to musi pasować do profilu w pliku dbt_project.yml
+  target: dev # Domyślna opcja dla wszystkich poleceń dbt
   outputs:
     dev:
       type: bigquery
-      # method: oauth
+      # metoda: oauth
       method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
       keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
-      # To use this, first run (in your terminal): export BIGQUERY_PROJECT="your_project_name"
-      # Then dbt will recognise the variable
+
+      # Aby użyć tej opcji, najpierw uruchom (w terminalu): export BIGQUERY_PROJECT="twoja_nazwa_projektu"
+      # Następnie dbt rozpozna tę zmienną
       # database: "{{ env_var('BIGQUERY_PROJECT') }}"
+
       database: "coral-shift-440513-f3"
-      schema: dbt_dev # Replace this with dbt_your_name, e.g. dbt_bob
-      threads: 64 # Max number of concurrent things running at once
+      schema: dbt_dev # Schema, w której dbt ma tworzyć tabele
+      threads: 64 # Maksymalna liczba równoczesnych procesów
       timeout_seconds: 300
       location: US
-      priority: interactive # BigQuery can use "batch" or "interactive". https://cloud.google.com/bigquery/docs/running-queries
+      priority: interactive # BigQuery może używać opcji "batch" lub "interactive". https://cloud.google.com/bigquery/docs/running-queries
       maximum_bytes_billed: 1000000000  # Limit 1 GB na zapytanie
 
-    # You won't use this, but an example of using a different target
+    # Nie będziesz tego używać, ale jest to przykład użycia innego celu
     production:
       type: bigquery
-      # method: oauth
+      # metoda: oauth
       method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
       keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
-      # database: "{{ env_var('BIGQUERY_PROJECT') }}"
       database: "coral-shift-440513-f3"
       schema: dbt_production
       threads: 64
