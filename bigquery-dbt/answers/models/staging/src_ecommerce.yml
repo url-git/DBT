@@ -1,20 +1,31 @@
-# Needed for every dbt yml file - https://docs.getdbt.com/faqs/project/why-version-2
+# Każdy plik YAML w dbt wymaga określenia wersji - tutaj używamy wersji 2.
+# Jest to wymóg dokumentacji dbt: https://docs.getdbt.com/faqs/project/why-version-2
 version: 2
 
+# Definiujemy źródła danych (sources), które będą używane w modelach dbt.
 sources:
-  - name: thelook_ecommerce
-    # database <> project are interchangeable in dbt-bigquery
-    # project is specific to just dbt-bigquery, whereas database can be used with anything - e.g. Snowflake
+  - name: thelook_ecommerce  # Nazwa źródła danych, które będziemy używać w projekcie dbt.
+
+    # W dbt na BigQuery "database" i "project" są zamienne.
+    # "project" odnosi się wyłącznie do dbt-bigquery, podczas gdy "database" może być używane w innych silnikach np. Snowflake.
     database: bigquery-public-data
+
+    # Lista tabel, które będą używane w modelach dbt.
     tables:
-      - name: distribution_centers
-      - name: events
+      - name: distribution_centers  # Tabela zawierająca dane o centrach dystrybucyjnych.
+
+      - name: events  # Tabela przechowująca dane o zdarzeniach użytkowników na stronie.
+
+        # Definiujemy świeżość danych (freshness), czyli jak aktualne powinny być dane.
         freshness:
-          warn_after: {count: 12, period: hour}
-          error_after: {count: 24, period: hour}
+          warn_after: {count: 12, period: hour}  # Jeśli dane są starsze niż 12 godzin, generowane jest ostrzeżenie.
+          error_after: {count: 24, period: hour}  # Jeśli dane są starsze niż 24 godziny, generowany jest błąd.
+
+        # Pole "created_at" będzie używane do sprawdzania, kiedy dane zostały ostatnio załadowane.
         loaded_at_field: created_at
-      - name: inventory_items
-      - name: order_items
-      - name: orders
-      - name: products
-      - name: users
+
+      - name: inventory_items  # Tabela z danymi o stanie magazynowym.
+      - name: order_items  # Tabela z pozycjami zamówień.
+      - name: orders  # Tabela przechowująca dane o zamówieniach klientów.
+      - name: products  # Tabela zawierająca informacje o produktach.
+      - name: users  # Tabela z danymi o użytkownikach.
