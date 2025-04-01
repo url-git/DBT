@@ -1,41 +1,62 @@
-version: 2  # Określenie wersji pliku konfiguracji dbt
+version: 2
 
 models:
-  - name: stg_ecommerce__orders  # Nazwa modelu dbt dla zamówień w e-commerce
-    description: "Tabela zawierająca zamówienia e-commerce"  # Opis modelu - każdy wiersz reprezentuje jedno zamówienie
+  - name: stg_ecommerce__orders  # Nazwa modelu reprezentującego zamówienia
+    description: "Tabela zawierająca jedno zamówienie na wiersz"
     columns:
-      - name: order_id
+      - name: order_id  # Unikalny identyfikator zamówienia
         description: "Unikalny identyfikator zamówienia"
         tests:
-          - not_null
-          - unique
+          - not_null  # Sprawdza, czy pole nie jest puste
+          - unique  # Sprawdza, czy wartość jest unikalna
 
-      - name: user_id
-        description: "Identyfikator użytkownika składającego zamówienie"
-
-      - name: status
-        description: "Status zamówienia"
+      - name: user_id  # Identyfikator użytkownika składającego zamówienie
+        description: "Identyfikator użytkownika powiązany z zamówieniem"
         tests:
-          - accepted_values:
-              name: unexpected_order_status
+          - not_null  # Upewnia się, że użytkownik zawsze jest przypisany do zamówienia
+
+      - name: status  # Status zamówienia
+        description: "Aktualny status zamówienia"
+        tests:
+          - accepted_values:  # Test sprawdzający, czy status mieści się w określonych wartościach
+              name: unexpected_order_status  # Nazwa testu ułatwiająca diagnozowanie błędów
               values:
-                - Processing
-                - Cancelled
-                - Shipped
-                - Complete
-                - Returned
+                - Processing  # Zamówienie w trakcie przetwarzania
+                - Cancelled  # Zamówienie anulowane
+                - Shipped  # Zamówienie wysłane
+                - Complete  # Zamówienie zrealizowane
+                - Returned  # Zamówienie zwrócone
 
-      - name: created_at
-        description: "Data i czas utworzenia zamówienia"
+      - name: created_at  # Data utworzenia zamówienia
+        description: "Data i godzina utworzenia zamówienia"
+        tests:
+          - not_null  # Każde zamówienie musi mieć określoną datę utworzenia
 
-      - name: returned_at
-        description: "Data i czas zwrotu zamówienia"
+      - name: returned_at  # Data zwrotu zamówienia
+        description: "Data i godzina zwrócenia zamówienia, jeśli zostało zwrócone"
+        tests:
+          - not_null:
+              where: "status = 'Returned'"  # Tylko dla zamówień, które mają status "Returned"
 
-      - name: shipped_at
-        description: "Data i czas wysłania zamówienia"
+      - name: shipped_at  # Data wysyłki zamówienia
+        description: "Data i godzina wysłania zamówienia"
+        tests:
+          - not_null:
+              where: "delivered_at IS NOT NULL OR status = 'Shipped'"  # Musi być uzupełnione, jeśli zamówienie zostało dostarczone lub jest wysłane
 
-      - name: delivered_at
-        description: "Data i czas dostarczenia zamówienia"
+      - name: delivered_at  # Data dostarczenia zamówienia
+        description: "Data i godzina dostarczenia zamówienia"
+        tests:
+          - not_null:
+              where: "returned_at IS NOT NULL OR status = 'Complete'"  # Pole powinno być uzupełnione, jeśli zamówienie jest zwrócone lub zakończone
 
-      - name: num_of_item
-        description: "Liczba przedmiotów w zamówieniu"
+      - name: num_items_ordered  # Liczba pozycji w zamówieniu
+        description: "Liczba produktów zawartych w zamówieniu"
+        tests:
+          - not_null  # Każde zamówienie powinno zawierać przynajmniej jedną pozycję
+
+# Podsumowanie:
+# Ten plik YAML definiuje schemat tabeli 'stg_ecommerce__orders' w DBT.
+# Zawiera szczegółowe informacje na temat kolumn oraz testów sprawdzających poprawność danych.
+# Testy pomagają zapewnić integralność danych, np. sprawdzają unikalność ID zamówień,
+# poprawność statusów oraz obecność wymaganych dat w zależności od statusu zamówienia.
