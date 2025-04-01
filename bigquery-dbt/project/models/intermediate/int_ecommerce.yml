@@ -1,0 +1,56 @@
+version: 2  # Określa wersję schematu konfiguracji dbt
+
+models:
+  - name: int_ecommerce__order_items_products  # Nazwa modelu w dbt
+    description: "Dane pozycji zamówienia połączone z danymi produktów"  # Opis modelu
+
+    columns:
+      - name: order_item_id  # Identyfikator pozycji zamówienia
+        tests:
+          - not_null  # Sprawdza, czy kolumna nie zawiera wartości NULL
+          - unique  # Sprawdza, czy wartości w kolumnie są unikalne
+
+      - name: order_id  # Identyfikator zamówienia
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      # "&user_id" to tzw. kotwica YML (YML anchor), która pozwala na ponowne użycie definicji w pliku
+      - &user_id
+        name: user_id  # Unikalny identyfikator użytkownika
+        description: "Unikalny identyfikator użytkownika"
+        tests:
+          - not_null  # Sprawdza, czy kolumna nie zawiera wartości NULL
+
+      - name: product_id  # Identyfikator produktu
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      - name: item_sale_price  # Cena sprzedaży pozycji zamówienia
+        description: "Cena, za którą przedmiot został sprzedany"
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      - name: product_department  # Kategoria produktu (np. odzież męska lub damska)
+        description: "Czy produkt należy do działu odzieży męskiej czy damskiej"
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      - name: product_cost  # Koszt zakupu produktu przez firmę
+        description: "Koszt zakupu produktu dla firmy"
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      - name: product_retail_price  # Cena detaliczna produktu w sklepie online
+        description: "Cena detaliczna produktu w sklepie internetowym"
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      - name: item_profit  # Zysk z pojedynczego przedmiotu
+        description: "item_sale_price minus product_cost"
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
+
+      - name: item_discount  # Rabat na przedmiot
+        description: "product_retail_price minus item_sale_price"
+        tests:
+          - not_null  # Sprawdza, czy wartość nie jest NULL
