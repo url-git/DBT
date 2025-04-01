@@ -1,20 +1,30 @@
-models:
+version: 2
 
+models:
   - name: stg_ecommerce__products
-    description: ""
+    description: "Tabela produktów w sklepie internetowym"
     columns:
       - name: product_id
-        data_type: int64
-        description: ""
+        tests:
+          - not_null  # Sprawdza, czy pole 'product_id' nie jest puste
+          - unique  # Sprawdza, czy pole 'product_id' zawiera unikalne wartości
 
       - name: cost
-        data_type: float64
-        description: ""
+        description: "Koszt zakupu produktu przez firmę"
+        tests:
+          - not_null  # Sprawdza, czy koszt produktu jest określony
 
       - name: retail_price
-        data_type: float64
-        description: ""
+        description: "Cena detaliczna produktu w sklepie internetowym"
+        tests:
+          - not_null  # Sprawdza, czy cena detaliczna produktu jest określona
 
       - name: department
-        data_type: string
-        description: ""
+        description: "Czy produkt należy do działu 'Menswear' czy 'Womenswear'"
+        tests:
+          - not_null  # Sprawdza, czy pole 'department' nie jest puste
+          - accepted_values:
+              values:
+                - "Men"  # Możliwe wartości: 'Men' - odzież męska
+                - "Women"  # Możliwe wartości: 'Women' - odzież damska
+              quote: true  # Umożliwia użycie wartości tekstowych (np. 'Men' lub 'Women')
