@@ -34,7 +34,7 @@ models:
     +persist_docs:        # Zapisuje opisy kolumn w bazie danych (np. BigQuery)
       relation: true
       columns: true
-    +hours_to_expiration: 168  # Modele tabelaryczne wygasają po 7 dniach (168 godzin)
+    +hours_to_expiration: 8760  # Tabela zostanie usunięta po 8760 godzinach (1 roku) od utworzenia
 
 # Konfiguracja domyślna dla testów w projekcie
 tests:
