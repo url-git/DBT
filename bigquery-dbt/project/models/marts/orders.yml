@@ -1,0 +1,60 @@
+version: 2  # Określa wersję pliku YAML dla konfiguracji modeli w dbt
+
+models:
+  - name: orders  # Definicja modelu "orders"
+    description: "Tabela zawierająca informacje na poziomie zamówienia"
+    columns:
+
+    # Kolumny pochodzące z modelu staging "stg_ecommerce__orders"
+    # Nie testujemy tych kolumn (poza kluczem głównym), ponieważ zostały już przetestowane w modelu staging.
+    # Można jednak dodać własne testy według potrzeb.
+
+      - name: order_id  # Klucz główny identyfikujący zamówienie
+        tests:
+          # Test sprawdzający unikalność wartości w kolumnie order_id
+          - unique
+
+          # Test relacji sprawdzający, czy każda wartość order_id istnieje w modelu "stg_ecommerce__orders"
+          - relationships:
+              to: ref('stg_ecommerce__orders')  # Odniesienie do modelu staging
+              field: order_id  # Kolumna, względem której sprawdzana jest zgodność
+
+      - name: order_created_at
+        description: "Data i godzina utworzenia zamówienia"
+
+      - name: order_returned_at
+        description: "Data i godzina zwrotu zamówienia"
+
+      - name: order_delivered_at
+        description: "Data i godzina dostarczenia zamówienia"
+
+      - name: order_shipped_at
+        description: "Data i godzina wysyłki zamówienia"
+
+      - name: order_status  # Status zamówienia (np. 'shipped', 'delivered', 'returned')
+
+      - name: num_items_ordered
+        description: "Liczba produktów w ramach zamówienia"
+
+    # Kolumny pochodzące z modelu "int_ecommerce__order_items_product"
+    # Te kolumny są nowymi wyliczeniami, dlatego należy je przetestować.
+
+      - name: total_sale_price
+        description: "Suma wartości sprzedaży (item_sale_price) dla całego zamówienia"
+        tests:
+          - not_null  # Sprawdza, czy kolumna nie zawiera wartości NULL
+
+      - name: total_product_cost
+        description: "Łączny koszt zakupu produktów w zamówieniu"
+        tests:
+          - not_null  # Kolumna nie może zawierać wartości NULL
+
+      - name: total_profit
+        description: "Łączny zysk z zamówienia (total_sale_price - total_product_cost)"
+        tests:
+          - not_null  # Kolumna nie może zawierać wartości NULL
+
+      - name: total_discount
+        description: "Łączna kwota rabatu (product_retail_price - item_sale_price)"
+        tests:
+          - not_null  # Kolumna nie może zawierać wartości NULL
