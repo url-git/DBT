@@ -1,12 +1,13 @@
-There are 2 types of test you can create:
-1. Generic tests:
-	- Can be used in a YML file
-	- These must live in either the `macros/` folder or `tests/generic`. I prefer the latter
-	- Need to be wrapped in {% test test_name(arguments) %} {% endtest %} within a SQL file
-2. Custom tests:
-	- Standalone SQL files that live in the `tests/` folder
-	- These don't need any {% test %} tags, they just need to use ref('') to point at the model(s) to test
+W dbt istnieją 2 rodzaje testów, które możesz tworzyć:
 
-Note that in dbt_project.yml you can specify other paths for your tests under "test-paths"
+1.	Niestandardowe testy pojedyncze (Singular Tests)
+* Są to pliki SQL umieszczone w katalogu tests/.
+* Każdy test to po prostu zapytanie SQL, które zwraca wiersze w przypadku niezgodności.
+* Nie wymagają specjalnej składni {% test %}, wystarczy użyć ref('model_name') do wskazania modelu do testowania.
+2.	Niestandardowe testy ogólne (Generic Tests)
+* Są używane w plikach YAML jako część definicji modeli i kolumn.
+* Powinny być umieszczone w folderze macros/ lub tests/generic/ (zaleca się tests/generic/).
+* Wymagają zdefiniowania makra z {% test test_name(arguments) %} ... {% endtest %}.
+* Mogą być wielokrotnie używane w różnych modelach.
 
-
+Podsumowując: Testy niestandardowe pojedyncze są po prostu zapytaniami SQL, a testy ogólne są makrami wykorzystywanymi w YAML.
