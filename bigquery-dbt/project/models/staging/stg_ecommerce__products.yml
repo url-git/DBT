@@ -1,30 +1,36 @@
-version: 2
+version: 2  # Określenie wersji konfiguracji dbt
 
 models:
-  - name: stg_ecommerce__products
+  - name: stg_ecommerce__products  # Definicja modelu `stg_ecommerce__products`
     description: "Tabela produktów w sklepie internetowym"
-    columns:
-      - name: product_id
-        tests:
-          - not_null  # Sprawdza, czy pole 'product_id' nie jest puste
-          - unique  # Sprawdza, czy pole 'product_id' zawiera unikalne wartości
 
-      - name: cost
+    columns:
+      - name: product_id  # Klucz główny tabeli `product_id`
+        tests:
+          - not_null:  # Sprawdzenie, czy `product_id` nie zawiera wartości NULL
+              severity: error  # Jeśli test nie przejdzie, pipeline zostanie przerwany
+          - unique:  # Sprawdzenie, czy `product_id` jest unikalne
+              severity: error  # Błąd krytyczny, ponieważ duplikaty mogłyby powodować błędy
+
+      - name: cost  # Kolumna `cost`, czyli koszt zakupu produktu
         description: "Koszt zakupu produktu przez firmę"
         tests:
-          - not_null  # Sprawdza, czy koszt produktu jest określony
+          - not_null:  # Sprawdzenie, czy `cost` nie zawiera NULL-i
+              warn_if: ">10"  # Ostrzeżenie, jeśli więcej niż 10 wierszy ma wartość NULL
+              error_if: ">100"  # Błąd, jeśli więcej niż 100 wierszy ma wartość NULL
 
-      - name: retail_price
+      - name: retail_price  # Kolumna `retail_price`, czyli cena detaliczna
         description: "Cena detaliczna produktu w sklepie internetowym"
         tests:
-          - not_null  # Sprawdza, czy cena detaliczna produktu jest określona
+          - not_null  # Sprawdzenie, czy cena detaliczna nie zawiera wartości NULL
 
-      - name: department
-        description: "Czy produkt należy do działu 'Menswear' czy 'Womenswear'"
+      - name: department  # Kolumna `department` określająca kategorię produktu
+        description: "Określa, czy produkt należy do kategorii męskiej czy damskiej"
         tests:
-          - not_null  # Sprawdza, czy pole 'department' nie jest puste
-          - accepted_values:
+          - not_null  # Sprawdzenie, czy kolumna nie zawiera NULL-i
+          - accepted_values:  # Sprawdzenie, czy wartość należy do dozwolonej listy
               values:
-                - "Men"  # Możliwe wartości: 'Men' - odzież męska
-                - "Women"  # Możliwe wartości: 'Women' - odzież damska
-              quote: true  # Umożliwia użycie wartości tekstowych (np. 'Men' lub 'Women')
+                - "Men"  # Dozwolona wartość: `Men`
+                # - "Women"  # (Komentarz: jeśli dodamy tę wartość, test zaakceptuje również "Women")
+              quote: true  # Określenie, że wartości są traktowane jako stringi
+              severity: error  # Jeśli wartość nie jest na liście, pipeline zostanie przerwany
