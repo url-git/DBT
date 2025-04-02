@@ -3,6 +3,9 @@ version: 2
 models:
   - name: stg_ecommerce__orders  # Nazwa modelu reprezentującego zamówienia
     description: "Tabela zawierająca jedno zamówienie na wiersz"
+    tests:
+      - test_order_details_match_order:  # Definicja testu zawiera tylko jeden klucz
+          path: tests/test_order_details_match_order.sql  # Ścieżka do pliku z niestandardowym testem
     columns:
       - name: order_id  # Unikalny identyfikator zamówienia
         description: "Unikalny identyfikator zamówienia"
@@ -60,3 +63,5 @@ models:
 # Zawiera szczegółowe informacje na temat kolumn oraz testów sprawdzających poprawność danych.
 # Testy pomagają zapewnić integralność danych, np. sprawdzają unikalność ID zamówień,
 # poprawność statusów oraz obecność wymaganych dat w zależności od statusu zamówienia.
+# Dodatkowo dodano niestandardowy test 'test_order_details_match_order', który sprawdza,
+# czy liczba pozycji w tabeli 'order_items' zgadza się z liczbą pozycji zamówionych w tabeli 'orders'.

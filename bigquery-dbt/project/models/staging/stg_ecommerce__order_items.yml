@@ -1,38 +1,50 @@
-version: 2  # Określenie wersji pliku konfiguracji dbt
+version: 2
 
 models:
-  - name: stg_ecommerce__order_items  # Nazwa modelu dbt
-    description: "Tabela zawierająca pozycje zamówień, czyli pojedyncze produkty w ramach zamówień e-commerce."
-
+  - name: stg_ecommerce__order_items
+    description: "Line items from orders"
+    config:
+      contract:
+        enforced: true
     columns:
-      - name: order_item_id  # Identyfikator pozycji zamówienia
-        description: "Unikalny identyfikator każdej pozycji w zamówieniu."
+      - name: order_item_id
+        # Model tests (run AFTER model is built)
         tests:
-          - not_null  # Test sprawdzający, czy kolumna nie zawiera wartości null
-          - unique  # Test sprawdzający unikalność wartości w kolumnie
+          - not_null:
+              severity: error
+          - unique:
+              severity: error
+        # Model contract (run BEFORE model is built)
+        data_type: INTEGER
+        constraints:
+          # Note - we could get rid of the not_null check above as it basically duplicates the contract
+          - type: not_null
 
-      - name: order_id  # Identyfikator zamówienia
-        description: "Identyfikator zamówienia, do którego należy dana pozycja zamówienia."
+      - name: order_id
+        data_type: INTEGER
         tests:
-          - not_null  # Test sprawdzający, czy kolumna nie zawiera wartości null
-          - relationships:  # Test relacji – sprawdza, czy wartość order_id istnieje w tabeli zamówień
-              to: ref('stg_ecommerce__orders')  # Odniesienie do modelu 'stg_ecommerce__orders'
-              field: order_id  # Sprawdzenie, czy order_id istnieje w tej tabeli
+          - not_null
+          - relationships:
+              to: ref('stg_ecommerce__orders')
+              field: order_id
 
-      - name: user_id  # Identyfikator użytkownika
-        description: "Identyfikator użytkownika, który dokonał zakupu."
+      - name: user_id
+        data_type: INTEGER
         tests:
-          - not_null  # Test sprawdzający, czy kolumna nie zawiera wartości null
+          - not_null
 
-      - name: product_id  # Identyfikator produktu
-        description: "Identyfikator produktu, który został zakupiony w ramach zamówienia."
+      - name: product_id
+        data_type: INTEGER
         tests:
-          - not_null  # Test sprawdzający, czy kolumna nie zawiera wartości null
-          - relationships:  # Test relacji – sprawdza, czy wartość product_id istnieje w tabeli produktów
-              to: ref('stg_ecommerce__products')  # Odniesienie do modelu 'stg_ecommerce__products'
-              field: product_id  # Sprawdzenie, czy product_id istnieje w tej tabeli
+          - not_null
+          - relationships:
+              to: ref('stg_ecommerce__products')
+              field: product_id
 
-      - name: item_sale_price  # Cena sprzedaży pozycji zamówienia
-        description: "Cena sprzedaży dla konkretnej pozycji w zamówieniu."
+      - name: item_sale_price
+        data_type: FLOAT64
+        description: "How much the item sold for"
         tests:
-          - not_null  # Test sprawdzający, czy kolumna nie zawiera wartości null
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0

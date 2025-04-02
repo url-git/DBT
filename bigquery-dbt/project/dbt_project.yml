@@ -33,8 +33,8 @@ models:
     +materialized: table  # Domyślna materializacja to tabela (table)
     +persist_docs:        # Zapisuje opisy kolumn w bazie danych (np. BigQuery)
       relation: true
-      columns: true
-    +hours_to_expiration: 8760  # Tabela zostanie usunięta po 8760 godzinach (1 roku) od utworzenia
+  columns: true
+  +hours_to_expiration: 168  # Tabela zostanie usunięta po 8760 godzinach (1 roku) od utworzenia
 
 # Konfiguracja domyślna dla testów w projekcie
 tests:

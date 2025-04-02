@@ -1,34 +1,32 @@
-{# Ta konfiguracja jest opcjonalna, ponieważ już ustawiliśmy domyślną powagę na 'warn' #}
-{{ config(severity='warn') }}  -- Ustawia poziom powagi testu na 'warn', co oznacza, że wynik testu będzie traktowany jako ostrzeżenie, a nie błąd.
-
- /*
+/*
     Sprawdza, czy dla każdego zamówienia liczba pozycji w tabeli order_items
-    odpowiada wartości num_items_ordered w tabeli orders.
+    zgadza się z kolumną num_items_ordered w tabeli orders.
 
-    Zwraca wszystkie wiersze, w których nie uzyskano zgodności.
+    Zwraca wszystkie wiersze, w których liczba pozycji w zamówieniu się nie zgadza.
 
-    Można przeprowadzić inne testy (np. sprawdzić, czy dla jednego zamówienia jest tylko jeden user_id,
-    czy znaczniki czasowe 'shipped_at' są takie same dla danego zamówienia), ale to jest tylko przykład testu niestandardowego.
+    Można przeprowadzić wiele innych kontroli, np. sprawdzić, czy dla każdego order_id
+    jest tylko jeden user_id, czy znaczniki czasowe 'shipped_at' są takie same dla danego zamówienia,
+    ale ten przykład to po prostu przykład niestandardowego testu.
 */
 
-WITH order_details AS (  -- Tworzy tymczasową tabelę 'order_details' zawierającą liczbę pozycji w zamówieniu.
+WITH order_details AS (  -- Tworzymy tymczasową tabelę order_details z liczbą pozycji w zamówieniu
     SELECT
-        order_id,  -- Pobiera identyfikator zamówienia
-        COUNT(*) AS num_of_items_in_order  -- Liczy liczbę pozycji w każdym zamówieniu (zlicza wiersze dla każdego order_id)
+        order_id,  -- Identyfikator zamówienia
+        COUNT(*) AS num_of_items_in_order  -- Liczba pozycji w zamówieniu
 
-    FROM {{ ref('stg_ecommerce__order_items') }}  -- Odwołuje się do tabeli 'stg_ecommerce__order_items' (zdefiniowanej jako model w DBT)
-    GROUP BY 1  -- Grupuje wyniki po order_id, aby uzyskać liczbę pozycji dla każdego zamówienia
+    FROM {{ ref('stg_ecommerce__order_items') }}  -- Odwołujemy się do tabeli order_items
+    GROUP BY 1  -- Grupujemy po order_id, aby uzyskać liczbę pozycji per zamówienie
 )
 
 SELECT
-    o.*,  -- Zwraca wszystkie kolumny z tabeli orders
-    od.*  -- Zwraca wszystkie kolumny z tymczasowej tabeli 'order_details'
+    o.*,  -- Zwracamy wszystkie kolumny z tabeli orders
+    od.*  -- Zwracamy wszystkie kolumny z tabeli order_details
 
-FROM {{ ref('stg_ecommerce__orders') }} AS o  -- Odwołuje się do tabeli 'stg_ecommerce__orders' (zdefiniowanej jako model w DBT)
-FULL OUTER JOIN order_details AS od USING(order_id)  -- Łączy tabele orders i order_details po identyfikatorze zamówienia
+FROM {{ ref('stg_ecommerce__orders') }} AS o  -- Odwołujemy się do tabeli orders
+FULL OUTER JOIN order_details AS od USING(order_id)  -- Łączymy order_details z orders po order_id
 WHERE
-    -- Wszystkie zamówienia powinny mieć co najmniej 1 pozycję, a każda pozycja powinna być powiązana z zamówieniem
-    o.order_id IS NULL  -- Sprawdza, czy zamówienie z tabeli 'orders' nie ma odpowiadającej pozycji w 'order_details'
-    OR od.order_id IS NULL  -- Sprawdza, czy pozycja w 'order_details' nie ma odpowiadającego zamówienia w 'orders'
-    -- Liczba pozycji w zamówieniu nie zgadza się
-    OR o.num_items_ordered != od.num_of_items_in_order  -- Sprawdza, czy liczba zamówionych pozycji w orders nie zgadza się z liczbą pozycji w order_items
+    -- Sprawdzamy, czy wszystkie zamówienia mają przynajmniej 1 pozycję, a każda pozycja jest przypisana do zamówienia
+    o.order_id IS NULL  -- Jeżeli nie ma pasującego zamówienia w orders
+    OR od.order_id IS NULL  -- Jeżeli nie ma pasującej pozycji w order_details
+    -- Sprawdzamy, czy liczba pozycji w zamówieniu nie zgadza się z wartością w orders
+    OR o.num_items_ordered != od.num_of_items_in_order  -- Jeżeli liczba zamówionych pozycji nie zgadza się z liczbą pozycji w order_items
