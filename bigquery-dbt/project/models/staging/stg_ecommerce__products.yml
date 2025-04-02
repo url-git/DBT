@@ -1,36 +1,42 @@
-version: 2  # Określenie wersji konfiguracji dbt
+version: 2  # Określa wersję pliku konfiguracji dbt
 
 models:
-  - name: stg_ecommerce__products  # Definicja modelu `stg_ecommerce__products`
-    description: "Tabela produktów w sklepie internetowym"
-
+  - name: stg_ecommerce__products  # Definiuje model o nazwie "stg_ecommerce__products"
+    description: "Tabela produktów w sklepie internetowym"  # Opis modelu
     columns:
-      - name: product_id  # Klucz główny tabeli `product_id`
+      - name: product_id  # Nazwa kolumny
         tests:
-          - not_null:  # Sprawdzenie, czy `product_id` nie zawiera wartości NULL
-              severity: error  # Jeśli test nie przejdzie, pipeline zostanie przerwany
-          - unique:  # Sprawdzenie, czy `product_id` jest unikalne
-              severity: error  # Błąd krytyczny, ponieważ duplikaty mogłyby powodować błędy
+          - not_null:  # Test sprawdzający, czy wartości nie są puste
+              severity: error  # Jeśli test nie przejdzie, zostanie zgłoszony błąd krytyczny
+          - unique:  # Test sprawdzający unikalność wartości w kolumnie
+              severity: error  # Błąd krytyczny w przypadku duplikatu
 
-      - name: cost  # Kolumna `cost`, czyli koszt zakupu produktu
+      - name: cost  # Kolumna przechowująca koszt zakupu produktu przez firmę
         description: "Koszt zakupu produktu przez firmę"
         tests:
-          - not_null:  # Sprawdzenie, czy `cost` nie zawiera NULL-i
-              warn_if: ">10"  # Ostrzeżenie, jeśli więcej niż 10 wierszy ma wartość NULL
-              error_if: ">100"  # Błąd, jeśli więcej niż 100 wierszy ma wartość NULL
+          - not_null  # Wartość nie może być pusta
+          - dbt_expectations.expect_column_values_to_be_between:  # Test sprawdzający, czy wartości mieszczą się w zakresie
+              min_value: 0  # Minimalna dopuszczalna wartość to 0 (koszt nie może być ujemny)
 
-      - name: retail_price  # Kolumna `retail_price`, czyli cena detaliczna
-        description: "Cena detaliczna produktu w sklepie internetowym"
+      - name: retail_price  # Kolumna przechowująca cenę sprzedaży produktu w sklepie internetowym
+        description: "Cena sprzedaży produktu w sklepie internetowym"
         tests:
-          - not_null  # Sprawdzenie, czy cena detaliczna nie zawiera wartości NULL
+          - not_null  # Wartość nie może być pusta
+          - dbt_expectations.expect_column_values_to_be_between:  # Test sprawdzający zakres wartości
+              min_value: 0  # Cena sprzedaży nie może być ujemna
+          - dbt_utils.expression_is_true:  # Test sprawdzający, czy cena sprzedaży jest większa lub równa kosztowi
+              name: retail_price_greater_than_cost  # Nazwa testu
+              expression: ">= cost"  # Warunek: cena sprzedaży musi być większa lub równa kosztowi
+              where: "retail_price IS NOT NULL"  # Test będzie stosowany tylko do rekordów, gdzie retail_price nie jest NULL
 
-      - name: department  # Kolumna `department` określająca kategorię produktu
-        description: "Określa, czy produkt należy do kategorii męskiej czy damskiej"
+      - name: department  # Kolumna określająca dział (męski lub damski)
+        description: "Czy produkt należy do działu męskiego (Men) czy damskiego (Women)"
         tests:
-          - not_null  # Sprawdzenie, czy kolumna nie zawiera NULL-i
-          - accepted_values:  # Sprawdzenie, czy wartość należy do dozwolonej listy
+          - not_null  # Wartość nie może być pusta
+          - accepted_values:  # Test sprawdzający, czy wartość kolumny należy do akceptowanych wartości
               values:
-                - "Men"  # Dozwolona wartość: `Men`
-                # - "Women"  # (Komentarz: jeśli dodamy tę wartość, test zaakceptuje również "Women")
-              quote: true  # Określenie, że wartości są traktowane jako stringi
-              severity: error  # Jeśli wartość nie jest na liście, pipeline zostanie przerwany
+                - "Men"  # Akceptowana wartość: Męski
+                - "Women"  # Akceptowana wartość: Damski
+              # quote określa, czy wartości mają być traktowane jako tekstowe
+              # domyślnie true, ale można ustawić false dla wartości numerycznych lub logicznych
+              quote: true  
