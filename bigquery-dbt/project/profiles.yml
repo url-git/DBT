@@ -1,4 +1,4 @@
-project:
+dev:
   outputs:
     dev:
       dataset: dbt_dev_project
