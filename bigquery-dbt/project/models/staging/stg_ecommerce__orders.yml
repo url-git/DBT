@@ -1,67 +1,55 @@
 version: 2
 
 models:
-  - name: stg_ecommerce__orders  # Nazwa modelu reprezentującego zamówienia
-    description: "Tabela zawierająca jedno zamówienie na wiersz"
-    tests:
-      - test_order_details_match_order:  # Definicja testu zawiera tylko jeden klucz
-          path: tests/test_order_details_match_order.sql  # Ścieżka do pliku z niestandardowym testem
+  - name: stg_ecommerce__orders
+    description: "Table of 1 row per order"
     columns:
-      - name: order_id  # Unikalny identyfikator zamówienia
-        description: "Unikalny identyfikator zamówienia"
+      - name: order_id
+        description: ""
         tests:
-          - not_null  # Sprawdza, czy pole nie jest puste
-          - unique  # Sprawdza, czy wartość jest unikalna
+          - not_null
+          - unique
 
-      - name: user_id  # Identyfikator użytkownika składającego zamówienie
-        description: "Identyfikator użytkownika powiązany z zamówieniem"
+      - name: user_id
         tests:
-          - not_null  # Upewnia się, że użytkownik zawsze jest przypisany do zamówienia
+          - not_null
 
-      - name: status  # Status zamówienia
-        description: "Aktualny status zamówienia"
+      - name: status
+        description: ""
         tests:
-          - accepted_values:  # Test sprawdzający, czy status mieści się w określonych wartościach
-              name: unexpected_order_status  # Nazwa testu ułatwiająca diagnozowanie błędów
+          - accepted_values:
+              name: unexpected_order_status # We can name our tests to make it easier to give more meaningful errors
               values:
-                - Processing  # Zamówienie w trakcie przetwarzania
-                - Cancelled  # Zamówienie anulowane
-                - Shipped  # Zamówienie wysłane
-                - Complete  # Zamówienie zrealizowane
-                - Returned  # Zamówienie zwrócone
+                - Processing
+                - Cancelled
+                - Shipped
+                - Complete
+                - Returned
 
-      - name: created_at  # Data utworzenia zamówienia
-        description: "Data i godzina utworzenia zamówienia"
+      - name: created_at
+        description: "When the order was created"
         tests:
-          - not_null  # Każde zamówienie musi mieć określoną datę utworzenia
+          - not_null
 
-      - name: returned_at  # Data zwrotu zamówienia
-        description: "Data i godzina zwrócenia zamówienia, jeśli zostało zwrócone"
-        tests:
-          - not_null:
-              where: "status = 'Returned'"  # Tylko dla zamówień, które mają status "Returned"
-
-      - name: shipped_at  # Data wysyłki zamówienia
-        description: "Data i godzina wysłania zamówienia"
+      - name: returned_at
+        description: "When the order was returned"
         tests:
           - not_null:
-              where: "delivered_at IS NOT NULL OR status = 'Shipped'"  # Musi być uzupełnione, jeśli zamówienie zostało dostarczone lub jest wysłane
+              where: "status = 'Returned'"
 
-      - name: delivered_at  # Data dostarczenia zamówienia
-        description: "Data i godzina dostarczenia zamówienia"
+      - name: shipped_at
+        description: "When the order was shipped"
         tests:
           - not_null:
-              where: "returned_at IS NOT NULL OR status = 'Complete'"  # Pole powinno być uzupełnione, jeśli zamówienie jest zwrócone lub zakończone
+              where: "delivered_at IS NOT NULL OR status = 'Shipped'"
 
-      - name: num_items_ordered  # Liczba pozycji w zamówieniu
-        description: "Liczba produktów zawartych w zamówieniu"
+      - name: delivered_at
+        description: "When the order was delivered"
         tests:
-          - not_null  # Każde zamówienie powinno zawierać przynajmniej jedną pozycję
+          - not_null:
+              where: "returned_at IS NOT NULL OR status = 'Complete'"
 
-# Podsumowanie:
-# Ten plik YAML definiuje schemat tabeli 'stg_ecommerce__orders' w DBT.
-# Zawiera szczegółowe informacje na temat kolumn oraz testów sprawdzających poprawność danych.
-# Testy pomagają zapewnić integralność danych, np. sprawdzają unikalność ID zamówień,
-# poprawność statusów oraz obecność wymaganych dat w zależności od statusu zamówienia.
-# Dodatkowo dodano niestandardowy test 'test_order_details_match_order', który sprawdza,
-# czy liczba pozycji w tabeli 'order_items' zgadza się z liczbą pozycji zamówionych w tabeli 'orders'.
+      - name: num_items_ordered
+        description: "Number of items in the order"
+        tests:
+          - not_null
