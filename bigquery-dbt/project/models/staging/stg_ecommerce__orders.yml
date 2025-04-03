@@ -45,6 +45,7 @@ models:
               where: "shipped_at IS NOT NULL"
 
       - name: status
+        description: "{{ doc('status') }}"
         # Look in documents/ecommerce/doc_ecommerce__status.md for this definition
         # We can reuse this definition in any column
         tests:
