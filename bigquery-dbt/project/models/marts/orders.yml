@@ -1,60 +1,60 @@
-version: 2  # Określa wersję pliku YAML dla konfiguracji modeli w dbt
+version: 2
 
 models:
-  - name: orders  # Definicja modelu "orders"
-    description: "Tabela zawierająca informacje na poziomie zamówienia"
+  - name: orders
+    description: "Table of order level information"
     columns:
 
-    # Kolumny pochodzące z modelu staging "stg_ecommerce__orders"
-    # Nie testujemy tych kolumn (poza kluczem głównym), ponieważ zostały już przetestowane w modelu staging.
-    # Można jednak dodać własne testy według potrzeb.
-
-      - name: order_id  # Klucz główny identyfikujący zamówienie
+    # Columns from stg_ecommerce__orders
+    # We don't test these columns, other than the primary key,
+    # as we've already tested them in the staging model. But feel free
+    # to add your own tests here!
+      - name: order_id
         tests:
-          # Test sprawdzający unikalność wartości w kolumnie order_id
+          # Generic test that we define in tests/generic/test_primary_key.sql
+          # Takes arguments for model & column_name, both of which are automatically passed to it
           - unique
-
-          # Test relacji sprawdzający, czy każda wartość order_id istnieje w modelu "stg_ecommerce__orders"
           - relationships:
-              to: ref('stg_ecommerce__orders')  # Odniesienie do modelu staging
-              field: order_id  # Kolumna, względem której sprawdzana jest zgodność
+              to: ref('stg_ecommerce__orders')
+              field: order_id
 
       - name: order_created_at
-        description: "Data i godzina utworzenia zamówienia"
+        description: "When the order was created"
 
       - name: order_returned_at
-        description: "Data i godzina zwrotu zamówienia"
+        description: "When the order was returned"
 
       - name: order_delivered_at
-        description: "Data i godzina dostarczenia zamówienia"
+        description: "When the order was delivered"
 
       - name: order_shipped_at
-        description: "Data i godzina wysyłki zamówienia"
+        description: "When the order was shipped"
 
-      - name: order_status  # Status zamówienia (np. 'shipped', 'delivered', 'returned')
+      - name: order_status
+
 
       - name: num_items_ordered
-        description: "Liczba produktów w ramach zamówienia"
+        description: "Number of items in the order"
 
-    # Kolumny pochodzące z modelu "int_ecommerce__order_items_product"
-    # Te kolumny są nowymi wyliczeniami, dlatego należy je przetestować.
 
+    # Columns from int_ecommerce__order_items_product
+    # We should test these columns as they're new
       - name: total_sale_price
-        description: "Suma wartości sprzedaży (item_sale_price) dla całego zamówienia"
+        description: "Sum of item_sale_price for the whole order"
         tests:
-          - not_null  # Sprawdza, czy kolumna nie zawiera wartości NULL
+          - not_null
 
       - name: total_product_cost
-        description: "Łączny koszt zakupu produktów w zamówieniu"
+        description: "Sum of product_cost for the whole order"
         tests:
-          - not_null  # Kolumna nie może zawierać wartości NULL
+          - not_null
 
       - name: total_profit
-        description: "Łączny zysk z zamówienia (total_sale_price - total_product_cost)"
+        description: "Sum of (item_sale_price - product_cost) for the whole order"
         tests:
-          - not_null  # Kolumna nie może zawierać wartości NULL
+          - not_null
 
       - name: total_discount
-        description: "Łączna kwota rabatu (product_retail_price - item_sale_price)"
+        description: "Sum of (product_retail_price - item_sale_price) for the whole order"
         tests:
-          - not_null  # Kolumna nie może zawierać wartości NULL
+          - not_null
