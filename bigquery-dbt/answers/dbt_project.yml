@@ -1,5 +1,5 @@
 # Nazwij swój projekt! Nazwy projektów powinny zawierać tylko małe litery
-# i podkreślniki. Dobra nazwa pakietu powinna odzwierciedlać nazwę organizacji
+# i podkreślniki. Dobra nazwa projektu powinna odzwierciedlać nazwę organizacji
 # lub przeznaczenie tych modeli.
 name: 'answers'  # Nazwa projektu
 version: '1.0.0'  # Wersja projektu
