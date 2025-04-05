@@ -12,7 +12,7 @@ answers: # to musi pasować do profilu w pliku dbt_project.yml
       # database: "{{ env_var('BIGQUERY_PROJECT') }}"
 
       database: "coral-shift-440513-f3"
-      schema: dbt_dev # Schema, w której dbt ma tworzyć tabele
+      schema: dbt_dev_answers # Schema, w której dbt ma tworzyć tabele
       threads: 64 # Maksymalna liczba równoczesnych procesów
       timeout_seconds: 300
       location: US
