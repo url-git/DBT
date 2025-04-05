@@ -14,6 +14,7 @@ sources:
       - name: orders
       - name: products
       - name: users
+      - name: distribution_centers # Nowa tabela na której jest robiony snapshots
 
 
 
