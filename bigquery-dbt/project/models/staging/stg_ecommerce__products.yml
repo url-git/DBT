@@ -1,43 +1,68 @@
-version: 2
+version: 2  # Wersja schematu pliku YAML, używana przez dbt do walidacji formatu
 
 models:
-  - name: stg_ecommerce__products
-    description: "Table of products on the online store"
-    columns:
-      - name: product_id
-        tests:
-          - primary_key:
-              severity: error
+  - name: stg_ecommerce__products  # Nazwa modelu dbt odpowiadająca plikowi .sql
+    description: "Table of products on the online store"  # Opis tabeli, pomocny w dokumentacji
 
-      - name: cost
+    columns:  # Sekcja definiująca kolumny i testy jakości danych
+      - name: product_id  # Unikalny identyfikator produktu
+        tests:  # Zestaw testów jakości danych dla tej kolumny
+          - not_null:  # Wartości nie mogą być puste (NULL)
+              severity: error  # Jeśli test nie przejdzie, traktuj to jako błąd krytyczny
+          - unique:  # Każdy `product_id` musi być unikalny
+              severity: error  # Błąd krytyczny, jeśli są duplikaty
+
+      - name: cost  # Koszt zakupu produktu dla firmy
         description: "How much the product cost the business to purchase"
         tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
+          - not_null  # Każdy produkt musi mieć przypisany koszt
+          - dbt_expectations.expect_column_values_to_be_between:  # Oczekujemy wartości >= 0
               min_value: 0
 
-      - name: retail_price
+      - name: retail_price  # Cena sprzedaży produktu w sklepie online
         description: "How much the product retails for on the online store"
         tests:
-          - not_null
-          - dbt_expectations.expect_column_values_to_be_between:
+          - not_null  # Cena nie może być pusta
+          - dbt_expectations.expect_column_values_to_be_between:  # Spodziewamy się wartości >= 0
               min_value: 0
-          - dbt_utils.expression_is_true:
+          - dbt_utils.expression_is_true:  # Cena sprzedaży musi być większa lub równa kosztowi
               expression: ">= cost"
 
-      - name: department
+      - name: department  # Dział produktu: męski lub damski
         description: "Whether the item is Menswear or Womenswear"
         tests:
-          - not_null
-          - accepted_values:
+          - not_null  # Wartość musi być obecna
+          - accepted_values:  # Dozwolone wartości to tylko "Men" lub "Women"
               values:
                 - "Men"
                 - "Women"
-              # quote defaults to true, but this just shows how you could set it to
-              # false if you wanted to have non-string values (e.g. numbers or a TRUE/FALSE column)
-              quote: true
+              quote: true  # Wartości typu tekstowego, muszą być ujęte w cudzysłowy
 
-      - name: brand
+      - name: brand  # Marka produktu
+        description: "Brand of the product"  # Opis kolumny w dokumentacji
+
+    latest_version: 2  # Najnowsza wersja modelu, używana domyślnie przez dbt
+
+    # Jeśli nie określisz explicite `latest_version`, dbt:
+    # – spróbuje dopasować plik bez wersji (np. `stg_ecommerce__products.sql`)
+    # – lub wybierze najwyższą zdefiniowaną wersję jako domyślną (czyli tutaj v2)
+
+    # Można to jednak kontrolować ręcznie — np. mając gotową wersję 2,
+    # ale chcąc jeszcze domyślnie korzystać z wersji 1 (np. w fazie testów),
+    # można ustawić: latest_version: 1
+
+    # Wtedy `ref('stg_ecommerce__products')` nadal wskazuje na wersję 1,
+    # dopóki jawnie nie użyjesz `ref('stg_ecommerce__products', version=2)`
 
 
+    versions:  # Wersjonowanie modelu — pozwala kontrolować zmiany schematu
+        - v: 1  # Wersja 1 modelu
+          columns:
+          - include: all  # Dołącz wszystkie kolumny
+            exclude: [brand]  # Z wyjątkiem `brand`, który został dodany dopiero w wersji 2
 
+        - v: 2  # Wersja 2 modelu
+          config:
+            alias: stg_ecommerce__products_v2  # Nazwa tabeli w bazie danych
+          columns:
+          - include: all  # Uwzględnij wszystkie kolumny, łącznie z `brand`

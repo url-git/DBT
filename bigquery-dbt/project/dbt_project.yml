@@ -35,6 +35,8 @@ models:
       relation: true
       columns: true
   +hours_to_expiration: 168  # Table deletes 168 hours (7 days) after creation
+  +model_versioning: true  # Włącza wersjonowanie modeli
+
 
 # Konfiguracja domyślna dla testów w projekcie
 tests:
