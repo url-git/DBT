@@ -1,66 +1,83 @@
-version: 2
+# Ten plik YAML dokumentuje dwa modele DBT i przypisuje im testy jakości danych:
+# - Pierwszy model `int_ecommerce__order_items_products` zawiera szczegółowe dane o produktach i zamówieniach.
+# - Drugi model `int_ecommerce__first_order_created` używa kotwicy YAML (&user_id), by uniknąć duplikacji.
+#
+# Wykorzystano:
+# - testy `not_null` i `unique` do walidacji poprawności danych,
+# - testy `expression_is_true` z `dbt_utils` do weryfikacji wyrażeń matematycznych,
+# - kotwice YAML (& oraz *) do ponownego wykorzystania tej samej definicji (DRY).
+#
+# Plik pomaga utrzymać jakość danych i jest kluczowy w procesie testowania modeli w DBT.
 
-# An example of putting 2 models in the same YML file
-# This has some advantages in being able to use YML anchors (more on that below) that let you
-# reuse descriptions, names, tests etc. across multiple models, whereas
-# dbt document blocks https://docs.getdbt.com/docs/collaborate/documentation#using-docs-blocks
-# can only be used for descriptions.
-# However, a disadvantage is that YML anchors can't be reused across files.
+version: 2  # Wersja schematu pliku YAML dla dokumentacji DBT
 
-models:
-  - name: int_ecommerce__order_items_products
-    description: "Order item data joined to product data"
-    columns:
-      - name: order_item_id
+models:  # Sekcja definiująca modele DBT opisane w tym pliku
+
+  - name: int_ecommerce__order_items_products  # Nazwa pierwszego modelu
+    description: "Order item data joined to product data"  # Opis modelu (po ang. — warto przetłumaczyć w docelowym projekcie)
+    columns:  # Lista kolumn w tym modelu i przypisanych im testów
+
+      - name: order_item_id  # Kolumna z unikalnym ID pozycji zamówienia
         tests:
-          - primary_key:
+          - not_null:        # Wartość nie może być NULL
+              severity: error
+          - unique:          # Wartości muszą być unikalne
               severity: error
 
-      - name: order_id
+      - name: order_id  # ID zamówienia
+        tests:
+          - not_null  # Wartość obowiązkowa
+
+      - &user_id  # Definicja kotwicy YAML — można ją potem wykorzystać wielokrotnie
+        name: user_id  # ID użytkownika
+        description: "Unique identifier for a user"  # Opis kolumny
+        tests:
+          - not_null  # Wartość obowiązkowa
+
+      - name: product_id  # ID produktu
         tests:
           - not_null
 
-      # The "&" is a YML anchor which you can reference later in the file
-      - &user_id
-        name: user_id
-        description: "Unique identifier for a user"
-        tests:
-          - not_null
-
-      - name: product_id
-        tests:
-          - not_null
-
-      - name: item_sale_price
+      - name: item_sale_price  # Cena sprzedaży pozycji
         description: "How much the item sold for"
         tests:
           - not_null
 
-      - name: product_department
+      - name: product_department  # Dział, np. odzież męska/damska
         description: "Whether the item is Menswear or Womenswear"
         tests:
           - not_null
 
-      - name: product_cost
+      - name: product_cost  # Koszt zakupu produktu przez firmę
         description: "How much the product cost the business to purchase"
         tests:
           - not_null
 
-      - name: product_retail_price
+      - name: product_retail_price  # Cena detaliczna w sklepie
         description: "How much the product retails for on the online store"
         tests:
           - not_null
 
-      - name: item_profit
+      - name: item_profit  # Zysk z pozycji (sprzedaż - koszt)
         description: "item_sale_price minus product_cost"
         tests:
           - not_null
-          - dbt_utils.expression_is_true:
+          - dbt_utils.expression_is_true:  # Test sprawdzający zgodność z wyrażeniem matematycznym
               expression: "= (item_sale_price - product_cost)"
 
-      - name: item_discount
+      - name: item_discount  # Rabat (cena detaliczna - sprzedażowa)
         description: "product_retail_price minus item_sale_price"
         tests:
           - not_null
           - dbt_utils.expression_is_true:
               expression: "= (product_retail_price - item_sale_price)"
+
+
+  - name: int_ecommerce__first_order_created  # Drugi model — zawiera dane o pierwszym zamówieniu użytkownika
+    columns:
+      - *user_id  # Użycie wcześniej zdefiniowanej kotwicy YAML — przejmuje nazwę, opis i testy z &user_id
+
+      # Alternatywne użycie anchorów (zakomentowane):
+      # - <<: *user_id
+      #   description: "New description"
+      # Pozwala zmienić opis, zachowując inne właściwości kotwicy
