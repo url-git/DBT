@@ -10,7 +10,19 @@ groups:
 
 models:
   - name: dim_orders
-    description: "Table of order level information"
+    description: "Tabela zawierająca informacje na poziomie zamówienia"
+
+    # Konfiguracja przypisująca model do grupy "sales"
+    # Grupa "sales" musi być wcześniej zdefiniowana w osobnym pliku YML (np. groups.yml)
+    config:
+      group: sales
+
+    # Ustawienie poziomu dostępu do modelu:
+    # - private: tylko inne modele z tej samej grupy (czyli "sales") mogą używać tego modelu przez ref()
+    # - protected: modele z tej samej grupy lub projektu mogą go używać (domyślny poziom)
+    # - public: każdy model (nawet z innego projektu dbt) może użyć ref()
+    access: private
+
     columns:
 
     # Columns from stg_ecommerce__orders
