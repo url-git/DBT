@@ -1,5 +1,13 @@
 version: 2
 
+groups:
+  - name: sales
+    owner:
+      # 'name' or 'email' is required; additional properties allowed
+      email: sales@my-company.com
+      slack: sales-data
+      github: sales-data-team
+
 models:
   - name: dim_orders
     description: "Table of order level information"
