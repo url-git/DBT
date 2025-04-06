@@ -2,7 +2,7 @@
 
 {{
 	config(
-		target_schema='dbt_snapshots',
+		target_schema='snapshots_project',
 		unique_key='id',
 		strategy='check',
 		check_cols=['name', 'latitude', 'longitude']
