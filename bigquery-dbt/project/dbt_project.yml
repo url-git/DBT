@@ -40,3 +40,9 @@ models:
 tests:
   project:
     +severity: warn  # Wszystkie testy domyślnie ustawione jako ostrzeżenie (warn)
+
+  marts: # Model zarządzania - group
+    sales:
+      +group: sales # Model zarządzania - group
+    marketing:
+      +group: marketing # Model zarządzania - group
