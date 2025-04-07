@@ -26,7 +26,7 @@ answers: # to musi pasować do profilu w pliku dbt_project.yml
       method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
       keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
       database: "coral-shift-440513-f3"
-      schema: dbt_production
+      schema: dbt_production_answers
       threads: 64
       timeout_seconds: 300
       location: US
