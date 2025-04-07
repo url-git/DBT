@@ -63,6 +63,6 @@ models:
 
         - v: 2  # Wersja 2 modelu
           config:
-            alias: stg_ecommerce__products_v2  # Nazwa tabeli w bazie danych
+            alias: stg_ecommerce__products # Nazwa tabeli w bazie danych
           columns:
           - include: all  # Uwzględnij wszystkie kolumny, łącznie z `brand`

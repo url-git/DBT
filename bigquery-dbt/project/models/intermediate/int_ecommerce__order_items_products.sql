@@ -5,7 +5,9 @@ WITH products AS (
 		cost AS product_cost,
 		retail_price AS product_retail_price
 
-	FROM {{ ref('stg_ecommerce__products') }}
+	-- FROM {{ ref('stg_ecommerce__products') }}
+	FROM {{ ref('stg_ecommerce__products', version=2) }} -- Model zarządzania – wersjonowanie modeli 
+
 )
 
 SELECT
