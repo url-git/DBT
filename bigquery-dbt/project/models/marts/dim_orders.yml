@@ -21,7 +21,8 @@ models:
     # - private: tylko inne modele z tej samej grupy (czyli "sales") mogą używać tego modelu przez ref()
     # - protected: modele z tej samej grupy lub projektu mogą go używać (domyślny poziom)
     # - public: każdy model (nawet z innego projektu dbt) może użyć ref()
-    access: private
+    # access: private
+    access: public
 
     columns:
 
