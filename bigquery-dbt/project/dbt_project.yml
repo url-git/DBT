@@ -27,6 +27,12 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Na początku każdego procesu dbt zostanie uruchomione makro get_brand_name()
+# (zdefiniowane w macros/macro_get_brand_name.sql). Tworzy ono funkcję użytkownika (UDF)
+# w schemacie w BigQuery.
+on-run-start:
+  - "{{ get_brand_name() }}"  # Automatyczne uruchomienie makra na starcie
+
 # Konfiguracja domyślnego zachowania dla modeli w projekcie
 models:
   project:
