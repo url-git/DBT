@@ -40,7 +40,13 @@ models:
     +persist_docs:        # Zapisuje opisy kolumn w bazie danych (np. BigQuery)
       relation: true
       columns: true
-  +hours_to_expiration: 168  # Table deletes 168 hours (7 days) after creation
+  # +hours_to_expiration: 168  # Table deletes 168 hours (7 days) after creation
+    +hours_to_expiration: |
+      {% if target.name == 'test' %} 1
+      {% else %} 168
+      {% endif %}
+
+
   +model_versioning: true  # Włącza wersjonowanie modeli
 
 
