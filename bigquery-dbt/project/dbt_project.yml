@@ -42,7 +42,7 @@ models:
       columns: true
   # +hours_to_expiration: 168  # Table deletes 168 hours (7 days) after creation
     +hours_to_expiration: |
-      {% if target.name == 'test' %} 1
+      {% if target.name == 'dev' %} 1
       {% else %} 168
       {% endif %}
 
