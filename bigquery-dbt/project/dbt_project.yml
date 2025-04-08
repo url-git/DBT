@@ -46,7 +46,6 @@ models:
       {% else %} 168
       {% endif %}
 
-
   +model_versioning: true  # Włącza wersjonowanie modeli
 
 
