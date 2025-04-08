@@ -5,7 +5,7 @@ answers: # to musi pasować do profilu w pliku dbt_project.yml
       type: bigquery
       # metoda: oauth
       method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
-      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
+      keyfile: /Users/p/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
 
       # Aby użyć tej opcji, najpierw uruchom (w terminalu): export BIGQUERY_PROJECT="twoja_nazwa_projektu"
       # Następnie dbt rozpozna tę zmienną
@@ -20,13 +20,13 @@ answers: # to musi pasować do profilu w pliku dbt_project.yml
       maximum_bytes_billed: 1000000000  # Limit 1 GB na zapytanie
 
     # Nie będziesz tego używać, ale jest to przykład użycia innego celu
-    production:
+    prod:
       type: bigquery
       # metoda: oauth
       method: service-account # Metoda uwierzytelniania - Service Account (dla GCP)
-      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
+      keyfile: /Users/p/Documents/sa/dbt-project.json # Ścieżka do pliku klucza uwierzytelniającego
       database: "coral-shift-440513-f3"
-      schema: dbt_production_answers
+      schema: dbt_prod_answers
       threads: 64
       timeout_seconds: 300
       location: US

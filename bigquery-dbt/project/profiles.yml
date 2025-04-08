@@ -5,7 +5,7 @@ dev:
       dataset: dbt_dev_project
       job_execution_timeout_seconds: 300
       job_retries: 1
-      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json
+      keyfile: /Users/p/Documents/sa/dbt-project.json
       location: US
       method: service-account
       priority: interactive
@@ -17,7 +17,7 @@ dev:
       dataset: dbt_prod_project
       job_execution_timeout_seconds: 300
       job_retries: 1
-      keyfile: /Users/pmackowka/Documents/sa/dbt-project.json
+      keyfile: /Users/p/Documents/sa/dbt-project.json
       location: US
       method: service-account
       priority: interactive
