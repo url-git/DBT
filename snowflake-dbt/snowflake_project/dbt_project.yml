@@ -33,6 +33,9 @@ models:
   snowflake_project:
     +materialized: view  # domyślnie wszystko jako `view`
     dim:
-      +materialized: table  # nadpisanie dla folderu `models/dim`
+      +materialized: table  # folder models/dim jako tabela
+    src:
+      +materialized: ephemeral  # folder models/src jako ephemeral
+
 
 
