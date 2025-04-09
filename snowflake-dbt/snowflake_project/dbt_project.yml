@@ -31,5 +31,8 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   snowflake_project:
-    # Config indicated by + and applies to all files under models/example/
+    +materialized: view  # domyślnie wszystko jako `view`
+    dim:
+      +materialized: table  # nadpisanie dla folderu `models/dim`
+
 
