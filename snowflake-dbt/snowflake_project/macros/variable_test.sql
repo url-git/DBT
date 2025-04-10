@@ -4,7 +4,7 @@
     -- {{ log("This shouldn't be printed", info=True) }}
     {# log("This really shouldn't be printed", info=True) #}
 
-    {% set your_name = "Zoltan" %}
+    {% set your_name = "Piotr" %}
     {{ log("Hello " ~ your_name ~ ", call your Mom!", info=true) }}
 
 
@@ -17,3 +17,14 @@
         {{ log("User name not defined", info=True) }}
     {% endif %}
 {% endmacro %}
+
+{#
+dbt run-operation logging_and_variables --profiles-dir .
+dbt run-operation logging_and_variables --profiles-dir . --args '{"user_name": "Piotr"}'
+
+15:54:35  Call your mom!
+15:54:35  This shouldn't be printed
+15:54:35  Hello Piotr, call your Mom!
+15:54:35  Now, hello PIOTR!
+15:54:35  User name defined:PIOTR
+#}
