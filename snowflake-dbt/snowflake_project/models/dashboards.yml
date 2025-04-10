@@ -11,7 +11,7 @@ exposures:
 
     depends_on:
       - ref('dim_listings_w_hosts')
-      - ref('mart_fullmoon_reviews')
+      - ref('full_moon_reviews')
 
     owner:
       name: Piotr

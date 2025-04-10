@@ -32,10 +32,15 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   snowflake_project:
     +materialized: view  # domyślnie wszystko jako `view`
+    +post-hook:
+      - "GRANT SELECT ON {{ this }} TO ROLE REPORTER"
     dim:
       +materialized: table  # folder models/dim jako tabela
     src:
       +materialized: ephemeral  # folder models/src jako ephemeral
+
+vars:
+  user_name: "PIOTR"
 
 
 
