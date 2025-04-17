@@ -167,3 +167,5 @@ google-cloud-sdk
 .DS_Store
 service_account.json
 configuration.yml
+profiles.yml
+
